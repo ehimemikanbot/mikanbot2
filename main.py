@@ -68,8 +68,8 @@ def handle_message(event):
         event.reply_token,
         TextSendMessage(text=word + '\n(三省堂 大辞林 第三版)' + meanings.lstrip() + '\n\n(実用日本語表現辞典)' + meanings2.lstrip()))
     
-    user=event.source.userId
-    line_bot_api.push_message(user, TextSendMessage(text='Hello World!'))
+    userID="m_m_sheep"
+    line_bot_api.push_message(userID, TextSendMessage(text='Hello World!'))
 
 
 
