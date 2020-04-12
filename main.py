@@ -1,3 +1,5 @@
+#質問形式botの方
+
 from flask import Flask, request, abort
 import requests
 from bs4 import BeautifulSoup
@@ -12,8 +14,8 @@ from linebot.exceptions import (
 )
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
+    TemplateSendMessage,ButtonsTemplate,URIAction,PostbackAction #こ↑こ↓が追加分
 )
-
 
 app = Flask(__name__)
 
@@ -23,6 +25,32 @@ YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
 
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
+
+def make_button_template():
+    message_template = TemplateSendMessage(
+        alt_text="にゃーん",
+        template=ButtonsTemplate(
+            text="どれか選んでください",
+            title="タイトル",
+            image_size="cover",
+            thumbnail_image_url="sakura.jpg",
+            actions=[
+                PostbackAction(
+                    label="",
+                    data="",
+                    display_text="回答1",
+                    text="none"
+                )
+                PostbackAction(
+                    label="",
+                    data="",
+                    display_text="回答1",
+                    text="none"   
+                )
+            ]
+        )
+    )
+    return message_template
 
 @app.route("/")
 def hello_world():
@@ -46,32 +74,18 @@ def callback():
     return 'OK'
 
 @handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    word = event.message.text
-    url = "https://www.weblio.jp/content/" + word
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36'}
-    r = requests.get(url, headers=headers)
-    html = r.text
-    bs = BeautifulSoup(html, 'lxml')
-    try:
-        meanings = bs.select_one("#cont > div:nth-child(6) > div > div.NetDicBody").text
-    except AttributeError:
-        meanings = "三省堂 大辞林 第三版には存在しません"
+# def handle_message(event):
 
-    #実用語も検索
-    try:
-        meanings2=bs.select_one("#cont > div.kijiWrp > div > div").text
-    except AttributeError:
-        meanings2 = "実用日本語表現辞典には存在しません"
-
+#     #オウム返しにいったんもどし
+#     line_bot_api.reply_message(
+#         event.reply_token,
+#         TextSendMessage(text=event.message.text))
+def handle_image_message(event):
+    messages = make_button_template()
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=word + '\n(三省堂 大辞林 第三版)' + meanings.lstrip() + '\n\n(実用日本語表現辞典)' + meanings2.lstrip()))
-    
-    userID="m_m_sheep"
-    line_bot_api.push_message(userID, TextSendMessage(text='Hello World!'))
-
-
+        messages
+    )
 
 if __name__ == "__main__":
 #    app.run()
