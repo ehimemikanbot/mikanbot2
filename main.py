@@ -41,12 +41,6 @@ def make_button_template():
                     display_text="回答1",
                     text="none"
                 )
-                PostbackAction(
-                    label="",
-                    data="",
-                    display_text="回答1",
-                    text="none"   
-                )
             ]
         )
     )
