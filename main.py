@@ -62,7 +62,7 @@ def re_text(gettext):
         settext='2ですね。'
     else:
         settext='そのたですね。'
-    return gettext
+    return settext
 
 # ポート番号の設定
 if __name__ == "__main__":
