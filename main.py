@@ -61,6 +61,7 @@ def handle_message(event):
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=settext)
+    )
 
 # 送信されたメッセージから返信内容を設定する
 # def re_text(gettext):
