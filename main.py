@@ -49,29 +49,19 @@ def callback():
 #以下でWebhookから送られてきたイベントをどのように処理するかを記述する
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=re_text(event.message.text))
+    )
 
-    gettext=event.message.text
+# 送信されたメッセージから返信内容を設定する
+def re_text(gettext):
     if gettext=='1':
         settext='1ですね。'
     elif gettext=='2':
         settext='2ですね。'
     else:
         settext='そのたですね。'
-
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=settext)
-    )
-
-# 送信されたメッセージから返信内容を設定する
-# def re_text(gettext):
-#     if gettext=='1':
-#         settext='1ですね。'
-#     elif gettext=='2':
-#         settext='2ですね。'
-#     else:
-#         settext='そのたですね。'
-    
     return gettext
 
 # ポート番号の設定
