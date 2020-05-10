@@ -62,14 +62,14 @@ def handle_message(event):
 
 # 送信されたメッセージから返信内容を設定する
 def re_text(gettext):
-    if re_text=='1':
+    if gettext=='1':
         settext='1ですね。'
-    elif re_text=='2':
+    elif gettext=='2':
         settext='2ですね。'
     else:
         settext='そのたですね。'
     
-    return settext
+    return gettext
 
 # ポート番号の設定
 if __name__ == "__main__":
