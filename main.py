@@ -8,7 +8,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
+    MessageEvent, TextMessage, TextSendMessage,FollowEvent
 )
 
 app = Flask(__name__)
@@ -20,20 +20,25 @@ YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
+#herokuへのデプロイが成功したかどうかを確認するためのコード
 @app.route("/")
 def hello_world():
     return "hello world!"
 
+#LINE DevelopersのWebhookにURLを指定してWebhookからURLにイベントが送られるようにする
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
+    # リクエストヘッダーから署名検証のための値を取得
     signature = request.headers['X-Line-Signature']
 
     # get request body as text
+    # リクエストボディを取得
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
 
     # handle webhook body
+    # 署名を検証し、問題なければhandleに定義されている関数を呼ぶ
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
@@ -41,12 +46,32 @@ def callback():
 
     return 'OK'
 
+@handler.add(FollowEvent)
+def handle_follow(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text='初めまして')
+    )
+
+#以下でWebhookから送られてきたイベントをどのように処理するかを記述する
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=event.message.text))
+        TextSendMessage(text=re_text(event.message.text))
 
+# 送信されたメッセージから返信内容を設定する
+def re_text(gettext):
+    if re_text=='1':
+        settext='1ですね。'
+    elif re_text=='2':
+        settext='2ですね。'
+    else:
+        settext='そのたですね。'
+    
+    return settext
+
+# ポート番号の設定
 if __name__ == "__main__":
 #    app.run()
     port = int(os.getenv("PORT"))
