@@ -8,7 +8,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,FollowEvent
+    MessageEvent, TextMessage, TextSendMessage,
 )
 
 app = Flask(__name__)
@@ -46,28 +46,30 @@ def callback():
 
     return 'OK'
 
-@handler.add(FollowEvent)
-def handle_follow(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='初めまして')
-    )
-
 #以下でWebhookから送られてきたイベントをどのように処理するかを記述する
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=re_text(event.message.text))
 
-# 送信されたメッセージから返信内容を設定する
-def re_text(gettext):
+    gettext=event.message.text
     if gettext=='1':
         settext='1ですね。'
     elif gettext=='2':
         settext='2ですね。'
     else:
         settext='そのたですね。'
+
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=settext)
+
+# 送信されたメッセージから返信内容を設定する
+# def re_text(gettext):
+#     if gettext=='1':
+#         settext='1ですね。'
+#     elif gettext=='2':
+#         settext='2ですね。'
+#     else:
+#         settext='そのたですね。'
     
     return gettext
 
