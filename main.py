@@ -21,11 +21,10 @@ line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 lesson = {
-    '月曜日の時間割':'月曜日は\n1:こくご\n2:たいいく\n3:さんすう\nです。',
-    '火曜日の時間割':'火曜日は\n1~2:りかじっけん\n3:こくご\nです。',
-    '水曜日の時間割':'水曜日は\n1:さんすう\n2:おんがく\n3:せいかつ\nです。',
-    '木曜日の時間割':'木曜日は\n1:たいいく\n2:かていか\n3:りか\nです。',
-    '金曜日の時間割':'金曜日は\n1:さんすう\n2:こくご\n3:がっかつ\nです。'
+    '就労証明書作成依頼':'以下の内容を記載し庶務までメールしてください。\n1:てすと\n2:テスト\n3:テスト\nです。',
+    '名刺作成依頼':'テスト\n1~2:テスト\n3:テスト\nです。',
+    'その他':'水曜日は\n1:さんすう\n2:おんがく\n3:せいかつ\nです。',
+    '手続きについて':'木曜日は\n1:たいいく\n2:かていか\n3:りか\nです。'
 }
 
 #herokuへのデプロイが成功したかどうかを確認するためのコード
@@ -57,10 +56,15 @@ def callback():
 #以下でWebhookから送られてきたイベントをどのように処理するかを記述する
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    if event.message.text=='時間割を教えて':
-        day_list=["月","火", "水", "木", "金"]
-        items=[QuickReplyButton(action=MessageAction(label=f"{day}",text=f"{day}曜日の時間割")) for day in day_list]
-        messages=TextSendMessage(text="何曜日の時間割ですか？",quick_reply=QuickReply(items=items))
+    if event.message.text=='質問':
+        day_list=["福利厚生","規則", "手当", "手続き", "金"]
+        items=[QuickReplyButton(action=MessageAction(label=f"{day}",text=f"{day}について")) for day in day_list]
+        messages=TextSendMessage(text="お問い合わせ内容を選択してください。",quick_reply=QuickReply(items=items))
+        line_bot_api.reply_message(event.reply_token,messages=messages)
+    elif event.message.text=='手続きについて':
+        day_list=["就労証明書作成依頼","名刺作成依頼","その他"]
+        items=[QuickReplyButton(action=MessageAction(label=f"{day}",text=f"{day}")) for day in day_list]
+        messages=TextSendMessage(text="お問い合わせ内容を選択してください。",quick_reply=QuickReply(items=items))
         line_bot_api.reply_message(event.reply_token,messages=messages)
     elif event.message.text in lesson:
         line_bot_api.reply_message(
